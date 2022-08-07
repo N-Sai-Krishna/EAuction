@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>5cabce88-7502-4eb2-9b56-aeeab1100632</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+    <AssemblyName>EAuction.Seller.API</AssemblyName>
+    <RootNamespace>EAuction.Seller.API</RootNamespace>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.20.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\EAuction.Core\EAuction.Core.Common\EAuction.Core.Common.csproj" />
+    <ProjectReference Include="..\..\EAuction.Core\Seller.Core\Seller.Core.csproj" />
+    <ProjectReference Include="..\..\EAuction.Infrastructure\EAuction.Common\EAuction.Common.csproj" />
+    <ProjectReference Include="..\..\EAuction.Infrastructure\EAuction.Messaging\EAuction.Messaging.csproj" />
+    <ProjectReference Include="..\..\EAuction.Infrastructure\EAuction.Persistence\EAuction.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
