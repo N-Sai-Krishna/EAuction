@@ -72,9 +72,6 @@ namespace Seller.API
             
             app.UsePathBase(new PathString("/e-Auction"));
 
-
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();

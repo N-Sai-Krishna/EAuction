@@ -7,7 +7,6 @@
     <DockerfileContext>..\..</DockerfileContext>
     <AssemblyName>EAuction.Buyer.API</AssemblyName>
     <RootNamespace>EAuction.Buyer.API</RootNamespace>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
