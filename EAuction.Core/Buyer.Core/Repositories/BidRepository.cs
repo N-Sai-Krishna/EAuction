@@ -22,5 +22,13 @@ namespace Buyer.Core.Repositories
             var result = await this.collection.FindAsync<AuctionBid>(filter);
             return result.FirstOrDefault();
         }
+
+        public async Task<List<AuctionBid>> FindBidByProductIdAsync(string productId)
+        {
+            var filter = Builders<AuctionBid>.Filter.Eq(s => s.ProductId, productId);
+
+            IAsyncCursor<AuctionBid> result = await this.collection.FindAsync<AuctionBid>(filter);
+            return result.ToList();
+        }
     }
 }

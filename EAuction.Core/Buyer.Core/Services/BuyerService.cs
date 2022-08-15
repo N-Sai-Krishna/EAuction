@@ -28,7 +28,7 @@ namespace Buyer.Core.Services
             this.logger = logger;
             this.buyerRepository = buyerRepository;
             this.bidRepository = bidRepository;
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.ToLower().Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.ToLower().Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task<bool> AddBidAsync(AuctionBuyer auctionBuyer, AuctionBid auctionBid)
@@ -45,11 +45,27 @@ namespace Buyer.Core.Services
 
                 auctionBid.BuyerId = buyer.Id;
 
+                await FindOrAddAuctionBid(auctionBid);
+
+                BidAddOrUpdateMessage bidAddOrUpdateMessage = new BidAddOrUpdateMessage
+                {
+                    ProductId = auctionBid.ProductId,
+                    AuctionBuyerBidDetails = new List<AuctionBuyerBidDetails>
+                {
+                     new AuctionBuyerBidDetails()
+                {
+                    ProductId = auctionBid.ProductId,
+                    FirstName = buyer.FirstName,
+                    Phone = buyer.Phone,
+                    Email = buyer.Email,
+                    BidAmount = auctionBid.BidAmount
+                }}};
+
                 await this.eventBusPublisher.PublishMessageAsync(
                     new EventMessage()
                     {
-                        MessageType = "AddOrUpdateBid",
-                        Message = JsonConvert.SerializeObject(auctionBid)
+                        MessageType = "BidAddedOrUpdated",
+                        Message = JsonConvert.SerializeObject(bidAddOrUpdateMessage)
 
                     });
             }
@@ -71,6 +87,29 @@ namespace Buyer.Core.Services
             }
             return result;
         }
+
+        private async Task<AuctionBid> FindOrAddAuctionBid(AuctionBid auctionBid)
+        {
+
+            var result = await bidRepository.FindBidByAsync(auctionBid.ProductId, auctionBid.BuyerId);
+            if (result == null)
+            {
+                await bidRepository.AddAsync(auctionBid);
+            }
+            else
+            {
+                await bidRepository.UpdateAsync(new AuctionBid()
+                {
+                    BuyerId = result.BuyerId,
+                    BidAmount = auctionBid.BidAmount,
+                    Id = result.Id,
+                    ProductId = result.ProductId
+                });
+            }
+
+            return result;
+        }
+
 
         public async Task<IList<AuctionBuyerBidDetails>> GetBidsForProduct(string productId)
         {
@@ -108,11 +147,33 @@ namespace Buyer.Core.Services
                     return false; 
                 }
 
+                var auctionBid = await this.bidRepository.FindBidByAsync(productId, auctionBuyer.Id);
+
+                auctionBid.BidAmount = bidAmount;
+
+                await this.bidRepository.UpdateAsync(auctionBid);
+
+
+                BidAddOrUpdateMessage bidAddOrUpdateMessage = new BidAddOrUpdateMessage
+                {
+                    ProductId = auctionBid.ProductId,
+                    AuctionBuyerBidDetails = new List<AuctionBuyerBidDetails>
+                {
+                     new AuctionBuyerBidDetails()
+                {
+                    ProductId = auctionBid.ProductId,
+                    FirstName = auctionBuyer.FirstName,
+                    Phone = auctionBuyer.Phone,
+                    Email = auctionBuyer.Email,
+                    BidAmount = auctionBid.BidAmount
+                }}
+                };
+
                 await this.eventBusPublisher.PublishMessageAsync(
                     new EventMessage()
                     {
-                        MessageType = "AddOrUpdateBid",
-                        Message = JsonConvert.SerializeObject(new AuctionBid() { BidAmount = bidAmount, BuyerId = auctionBuyer.Id, ProductId = productId })
+                        MessageType = "BidAddedOrUpdated",
+                        Message = JsonConvert.SerializeObject(bidAddOrUpdateMessage)
 
                     });
             }

@@ -38,7 +38,7 @@ namespace BidListing.Core.Consumer
                 {
                     var bidListingService = this.serviceScope.ServiceProvider.GetRequiredService<IBidListingService>();
 
-                    await bidListingService.AddProduct(new ProductAndBidDetails
+                    await bidListingService.AddUpdateBids(new ProductAndBidDetails
                     {
                         Id = bidAddOrUpdateMessage.ProductId,
                         Bids = bidAddOrUpdateMessage.AuctionBuyerBidDetails.Select(

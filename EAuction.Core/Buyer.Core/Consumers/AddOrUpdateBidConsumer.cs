@@ -15,27 +15,27 @@ using System.Threading.Tasks;
 
 namespace Buyer.Core.Consumers
 {
-    internal class AddOrUpdateBidConfirmSubscriber : IConsumerHandler
+    internal class AddOrUpdateBidConsumer : IConsumerHandler
     {
-        private readonly ILogger<AddOrUpdateBidConfirmSubscriber> logger;
+        private readonly ILogger<AddOrUpdateBidConsumer> logger;
         private readonly IServiceScope serviceScope;
         private readonly IEventBusSubscriber consumers;
         private readonly IEventBusTopicPublisher eventBusPublisher;
 
-        public AddOrUpdateBidConfirmSubscriber(ILogger<AddOrUpdateBidConfirmSubscriber> logger,IServiceProvider serviceProvider
+        public AddOrUpdateBidConsumer(ILogger<AddOrUpdateBidConsumer> logger,IServiceProvider serviceProvider
             , IEnumerable<IEventBusSubscriber> consumers, IEnumerable<IEventBusTopicPublisher> publishers)
         {
             this.logger = logger;
             this.serviceScope = serviceProvider.CreateScope();
-            this.consumers = consumers.FirstOrDefault(s=>s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.consumers = consumers.FirstOrDefault(s=>s.SubscriberName.Equals("AddOrUpdateBid", StringComparison.InvariantCultureIgnoreCase));
+            //this.consumers = consumers.FirstOrDefault(s=>s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task HandleMessageAsync(string message)
         {
             try
             {
-
                 var bid = JsonConvert.DeserializeObject<AuctionBid>(message);
 
                 if (bid != null)
@@ -44,30 +44,6 @@ namespace Buyer.Core.Consumers
                     var buyerService = this.serviceScope.ServiceProvider.GetRequiredService<IBuyerService>();
 
                     var result = await bidRepository.FindBidByAsync(bid.ProductId, bid.BuyerId);
-                    if (result == null)
-                    {
-                        await bidRepository.AddAsync(bid);
-                    }
-                    else 
-                    {
-                        await bidRepository.UpdateAsync(new AuctionBid()
-                        {
-                            BuyerId = result.BuyerId,
-                            BidAmount = bid.BidAmount,
-                            Id = result.Id,
-                            ProductId = result.ProductId
-                        });
-                    }
-
-                    await this.eventBusPublisher.PublishMessageAsync(
-                        new EventMessage()
-                        {
-                            MessageType = "BidAddedOrUpdated",
-                            Message = JsonConvert.SerializeObject(new BidAddOrUpdateMessage() { 
-                            AuctionBuyerBidDetails = await buyerService.GetBidsForProduct(bid.ProductId), ProductId = bid.ProductId
-                            })
-
-                        });
                 }
             }
             catch (Exception ex)

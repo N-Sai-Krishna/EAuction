@@ -20,6 +20,7 @@ namespace BidListing.Core
             services.AddScoped<IBidListingService, BidListingService>();
             services.AddSingleton<IConsumerHandler, AddProductConsumer>();
             services.AddSingleton<IConsumerHandler, BidAddedOrUpdatedConsumer>();
+            services.AddSingleton<IConsumerHandler, ProductDeleteConfirmationConsumer>();
         }
 
         public static void InitializeConsumers(this IApplicationBuilder app)

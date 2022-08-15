@@ -25,8 +25,8 @@ namespace Seller.Core.Consumer
         {
             this.logger = logger;
             this.serviceScope = serviceProvider.CreateScope();
-            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBid", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task HandleMessageAsync(string message)
@@ -47,7 +47,7 @@ namespace Seller.Core.Consumer
                         await this.eventBusPublisher.PublishMessageAsync(
                             new EventMessage()
                             {
-                                MessageType = "AddOrUpdateBidConfim",
+                                MessageType = "AddOrUpdateBid",
                                 Message = message
                             });
                     }

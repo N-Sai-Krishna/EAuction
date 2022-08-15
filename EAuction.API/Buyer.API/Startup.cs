@@ -75,6 +75,8 @@ namespace Buyer.API
 
             app.UseAuthorization();
 
+            app.InitializeConsumers();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

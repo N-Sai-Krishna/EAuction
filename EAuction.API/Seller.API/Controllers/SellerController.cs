@@ -41,7 +41,7 @@ namespace Seller.API.Controllers
         }
 
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("delete/{productId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(string productId)

@@ -13,20 +13,20 @@ using System.Threading.Tasks;
 
 namespace Buyer.Core.Consumers
 {
-    internal class DeleteProductSubscriber : IConsumerHandler
+    internal class ProductDeleteRequestConsumer : IConsumerHandler
     {
-        private readonly ILogger<DeleteProductSubscriber> logger;
+        private readonly ILogger<ProductDeleteRequestConsumer> logger;
         private readonly IServiceScope serviceScope;
         private readonly IEventBusSubscriber consumer;
         private readonly IEventBusTopicPublisher eventBusPublisher;
 
-        public DeleteProductSubscriber(ILogger<DeleteProductSubscriber> logger, IServiceProvider serviceProvider
+        public ProductDeleteRequestConsumer(ILogger<ProductDeleteRequestConsumer> logger, IServiceProvider serviceProvider
             , IEnumerable<IEventBusSubscriber> consumers, IEnumerable<IEventBusTopicPublisher> publishers)
         {
             this.logger = logger;
             this.serviceScope = serviceProvider.CreateScope();
-            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("ProductDeleteRequest", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
 
 
@@ -40,15 +40,23 @@ namespace Buyer.Core.Consumers
                 if (product != null)
                 {
 
-                    var result = this.serviceScope.ServiceProvider.GetRequiredService<IBidRepository>().Query().Where(s => s.ProductId == product.Id).Count();
+                    var bidRepository = this.serviceScope.ServiceProvider.GetRequiredService<IBidRepository>();
 
-                    if (result == 0)
+                    var bids = await bidRepository.FindBidByProductIdAsync(product.Id);
+
+                    foreach (var bid in bids)
+                    {
+                      await bidRepository.DeleteAsync(bid.Id);
+                    }
+
+
+                    if (bids.Any())
                     {
                         await this.eventBusPublisher.PublishMessageAsync(
                             new EventMessage()
                             {
-                                MessageType = "ProductDetailConfirmation",
-                                Message = message
+                                MessageType = "ProductDeleteConfirmation",
+                                Message = JsonConvert.SerializeObject(product)
                             });
                     }
                 }
