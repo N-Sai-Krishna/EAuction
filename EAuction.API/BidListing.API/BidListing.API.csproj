@@ -23,4 +23,8 @@
     <ProjectReference Include="..\..\EAuction.Core\BidListing.Core\BidListing.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+
 </Project>

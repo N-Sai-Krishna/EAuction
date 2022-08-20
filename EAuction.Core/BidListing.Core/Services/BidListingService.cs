@@ -27,7 +27,11 @@ namespace BidListing.Core.Services
         {
             try
             {
-                await this.repository.AddAsync(productAndBidDetails);
+                var dbProduct = this.repository.FindByAsync(productAndBidDetails.Id);
+                if (dbProduct == null)
+                {
+                    await this.repository.AddAsync(productAndBidDetails);
+                }
             }
             catch (Exception ex)
             {
@@ -41,17 +45,24 @@ namespace BidListing.Core.Services
             {
                 var entity = await this.repository.FindByAsync(productAndBidDetails.Id);
 
-                var bid = entity.Bids.FirstOrDefault(s => s.Phone == productAndBidDetails.Bids.FirstOrDefault().Phone);
-
-                if (bid == null)
+                if (entity.Bids == null)
                 {
+                    entity.Bids = new List<BidDetails>();
                     entity.Bids.Add(productAndBidDetails.Bids.FirstOrDefault());
                 }
-                else 
+                else
                 {
-                    bid.BidAmount = productAndBidDetails.Bids.FirstOrDefault().BidAmount;
-                }
+                    var bid = entity.Bids.FirstOrDefault(s => s.Phone == productAndBidDetails.Bids.FirstOrDefault().Phone);
 
+                    if (bid == null)
+                    {
+                        entity.Bids.Add(productAndBidDetails.Bids.FirstOrDefault());
+                    }
+                    else
+                    {
+                        bid.BidAmount = productAndBidDetails.Bids.FirstOrDefault().BidAmount;
+                    }
+                }
                 await this.repository.UpdateAsync(entity);
             }
             catch (Exception ex)
