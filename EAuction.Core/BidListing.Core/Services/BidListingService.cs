@@ -27,7 +27,7 @@ namespace BidListing.Core.Services
         {
             try
             {
-                var dbProduct = this.repository.FindByAsync(productAndBidDetails.Id);
+                var dbProduct = await this.repository.FindByAsync(productAndBidDetails.Id);
                 if (dbProduct == null)
                 {
                     await this.repository.AddAsync(productAndBidDetails);
