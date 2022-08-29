@@ -70,6 +70,12 @@ namespace BidListing.API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BidListing.API v1"));
             }
+
+            app.UseCors(x => x
+               .AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
+
             app.UsePathBase(new PathString("/e-Auction"));
 
             app.UseRouting();
