@@ -1,8 +1,12 @@
 ﻿using BidListing.Core.Domain;
+using BidListing.Core.Domain.Messages;
+using BidListing.Core.Repositories;
 using EAuction.Persistence;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +27,11 @@ namespace BidListing.Core.Services
         {
             try
             {
-                await this.repository.AddAsync(productAndBidDetails);
+                var dbProduct = await this.repository.FindByAsync(productAndBidDetails.Id);
+                if (dbProduct == null)
+                {
+                    await this.repository.AddAsync(productAndBidDetails);
+                }
             }
             catch (Exception ex)
             {
@@ -36,12 +44,40 @@ namespace BidListing.Core.Services
             try
             {
                 var entity = await this.repository.FindByAsync(productAndBidDetails.Id);
-                entity.Bids = productAndBidDetails.Bids;
+
+                if (entity.Bids == null)
+                {
+                    entity.Bids = new List<BidDetails>();
+                    entity.Bids.Add(productAndBidDetails.Bids.FirstOrDefault());
+                }
+                else
+                {
+                    var bid = entity.Bids.FirstOrDefault(s => s.Phone == productAndBidDetails.Bids.FirstOrDefault().Phone);
+
+                    if (bid == null)
+                    {
+                        entity.Bids.Add(productAndBidDetails.Bids.FirstOrDefault());
+                    }
+                    else
+                    {
+                        bid.BidAmount = productAndBidDetails.Bids.FirstOrDefault().BidAmount;
+                    }
+                }
                 await this.repository.UpdateAsync(entity);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"BidListingService - AddUpdateBids - {ex.Message}");
+            }
+        }
+
+        public async Task DeleteProduct(AuctionProduct auctionProduct)
+        {
+            ProductAndBidDetails productAndBid = await this.repository.FindByAsync(auctionProduct.Id);
+
+            if (productAndBid != null)
+            {
+                await this.repository.DeleteAsync(productAndBid.Id);
             }
         }
 

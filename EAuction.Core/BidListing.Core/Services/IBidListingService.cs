@@ -1,4 +1,5 @@
 ﻿using BidListing.Core.Domain;
+using BidListing.Core.Domain.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,5 +14,7 @@ namespace BidListing.Core.Services
         Task AddUpdateBids(ProductAndBidDetails productAndBidDetails);
 
         Task<ProductAndBidDetails> GetProductAndBidDetails(string productId);
+
+        Task DeleteProduct(AuctionProduct auctionProduct);
     }
 }

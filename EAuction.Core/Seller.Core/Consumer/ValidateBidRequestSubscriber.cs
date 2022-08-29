@@ -25,8 +25,8 @@ namespace Seller.Core.Consumer
         {
             this.logger = logger;
             this.serviceScope = serviceProvider.CreateScope();
-            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("ValidateBidRequest", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task HandleMessageAsync(string message)
@@ -41,13 +41,13 @@ namespace Seller.Core.Consumer
 
                     var result = await this.serviceScope.ServiceProvider.GetRequiredService
                         <IRepository<AuctionProduct, string>>().FindByAsync(product.Id);
-                    
+
                     if (result != null && result.BidEndDate > DateTime.Now.Date)
                     {
                         await this.eventBusPublisher.PublishMessageAsync(
                             new EventMessage()
                             {
-                                MessageType = "AddOrUpdateBidConfim",
+                                MessageType = "AddOrUpdateBid",
                                 Message = message
                             });
                     }
@@ -55,7 +55,7 @@ namespace Seller.Core.Consumer
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Consumer - DeleteProduct - {ex.Message}");
+                this.logger.LogError($"Consumer - ValidateBidRequest - {ex.Message}");
 
             }
         }

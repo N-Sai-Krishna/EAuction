@@ -19,8 +19,8 @@ namespace Buyer.Core
             services.AddScoped<IBidRepository, BidRepository>();
             services.AddScoped<IRepository<AuctionBuyer, string>, BuyerRepository>();
             services.AddScoped<IBuyerService, BuyerService>();
-            services.AddSingleton<IConsumerHandler, DeleteProductSubscriber>();
-            services.AddSingleton<IConsumerHandler, AddOrUpdateBidConfirmSubscriber>();
+            services.AddSingleton<IConsumerHandler, ProductDeleteRequestConsumer>();
+            services.AddSingleton<IConsumerHandler, AddOrUpdateBidConsumer>();
         }
 
         public static void InitializeConsumers(this IApplicationBuilder app)

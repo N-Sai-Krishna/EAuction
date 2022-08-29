@@ -24,7 +24,7 @@ namespace Seller.Core.Consumer
         {
             this.logger = logger;
             this.serviceScope = serviceProvider.CreateScope();
-            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBidConfirm", StringComparison.InvariantCultureIgnoreCase));
+            this.consumer = consumers.FirstOrDefault(s => s.SubscriberName.Equals("AddOrUpdateBid", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task HandleMessageAsync(string message)

@@ -69,11 +69,14 @@ namespace Seller.API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SellerAPI v1"));
             }
-            
+
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+
             app.UsePathBase(new PathString("/e-Auction"));
-
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 

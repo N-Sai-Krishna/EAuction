@@ -26,7 +26,7 @@ namespace Seller.Core.Services
             this.logger = logger;
             this.productRepository = productRepository;
             this.sellerRepository = sellerRepository;
-            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.ToLower().Equals("eauctionmanagement", StringComparison.InvariantCultureIgnoreCase));
+            this.eventBusPublisher = publishers.FirstOrDefault(s => s.TopicName.ToLower().Equals("eauctionmanagementsbtopic", StringComparison.InvariantCultureIgnoreCase));
         }
         public async Task<bool> AddProductAsync(AuctionProduct auctionProduct, AuctionProductSeller auctionProductSeller)
         {
@@ -61,10 +61,13 @@ namespace Seller.Core.Services
         {
             try
             {
-                var result = await this.productRepository.FindByAsync(productId);
+                AuctionProduct result = await this.productRepository.FindByAsync(productId);
 
                 if (result != null && result.BidEndDate > DateTime.Now.Date)
                 {
+
+                    await this.productRepository.DeleteAsync(productId);
+
                     await this.eventBusPublisher.PublishMessageAsync(
                         new EventMessage()
                         {
@@ -76,7 +79,7 @@ namespace Seller.Core.Services
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"SellerService - AddProductAsync - {ex.Message}");
+                this.logger.LogError($"SellerService - ProductDeleteRequest - {ex.Message}");
                 return false;
             }
         }

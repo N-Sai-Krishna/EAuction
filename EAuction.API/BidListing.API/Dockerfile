@@ -23,4 +23,4 @@ RUN dotnet publish "BidListing.API.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BidListing.API.dll"]
+ENTRYPOINT ["dotnet", "EAuction.BidListing.API.dll"]
